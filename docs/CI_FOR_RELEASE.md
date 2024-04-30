@@ -10,20 +10,20 @@ This workflow is triggered by any push to branches that match the `release/**` p
 
 ### Jobs
 
-1. **automation_hello**
+1. **release_workflow**
    - **Trigger**: Runs on every push to `release/**` branches.
    - **Purpose**: Provides initial visibility and traceability by outputting basic information about the workflow and repository, such as workflow name, repository, branch, event name, and commit hash.
 
-2. **dummy_build**
-   - **Trigger**: Sequentially follows the `automation_hello` job.
+2. **release_build**
+   - **Trigger**: Sequentially follows the `release_workflow` job.
    - **Purpose**: Simulates the build process for release branches, representing where actual build processes would occur.
 
-3. **dummy_test**
-   - **Trigger**: Follows the `dummy_build` job.
+3. **release_test**
+   - **Trigger**: Follows the `release_build` job.
    - **Purpose**: Mimics the testing procedures, crucial for ensuring that releases are thoroughly tested before deployment. Outputs a message indicating simulation of testing procedures.
 
-4. **dummy_code_quality_check**
-   - **Trigger**: Occurs after the `dummy_test` job.
+4. **release_code_quality_check**
+   - **Trigger**: Occurs after the `release_test` job.
    - **Purpose**: Simulates code quality checks to ensure that releases meet the code standards. Outputs a message representing the simulation of code quality assessments.
 
 ## Best Practices and Usage
