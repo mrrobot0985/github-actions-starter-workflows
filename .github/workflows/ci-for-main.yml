@@ -38,7 +38,7 @@ jobs:
 
   production_pull_request_closed:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true }}
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
     steps:
       - name: Print Closed Pull Request Details
         run: |
