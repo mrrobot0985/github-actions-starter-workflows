@@ -67,8 +67,8 @@ jobs:
             version=$(cat "${GITHUB_WORKSPACE}/version.txt")
             echo "Using version from version.txt: $version"
             echo "VERSION=$version" >> $GITHUB_ENV
-            git tag -a "$version" -m "Release $version"
-            git push --follow-tags
+            git tag "$version"
+            git push origin ${{github.run_id}}
           else
             echo "version.txt not found."
             exit 1
