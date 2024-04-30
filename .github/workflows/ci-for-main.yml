@@ -51,27 +51,26 @@ jobs:
           echo "Closed Pull Request Merged: ${{ github.event.pull_request.merged }}"
       - name: Set Version
         run: |
-          if [ -f "version.txt" ]; then
-            if [[ "${{ github.event.pull_request.head.ref }}" == release/v*.*.* ]]; then
-              version=$(cat version.txt)
-              echo "Using version from version.txt: $version"
-            elif [[ "${{ github.event.pull_request.head.ref }}" == hotfix/* ]]; then
-              version=$(cat version.txt)
-              IFS='.' read -ra parts <<< "$version"
-              patch="${parts[2]}"
-              next_patch=$((patch + 1))
-              version="${parts[0]}.${parts[1]}.$next_patch"
-              echo "Incremented patch version: $version"
-            else
-              echo "Unsupported branch for versioning."
-              exit 1
-            fi
-            echo "VERSION=$version" >> $GITHUB_ENV
-            git tag -a "$version" -m "Release $version"
-            git push --tags
+          if [[ "${{ github.event.pull_request.head.ref }}" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            version=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/release\/v//')
+            echo "Using version from branch name: $version"
+          elif [ -f "version.txt" ]; then
+            version=$(cat version.txt)
+            echo "Using version from version.txt: $version"
+          elif [[ "${{ github.event.pull_request.head.ref }}" == hotfix/* ]]; then
+            version=$(cat version.txt)
+            IFS='.' read -ra parts <<< "$version"
+            patch="${parts[2]}"
+            next_patch=$((patch + 1))
+            version="${parts[0]}.${parts[1]}.$next_patch"
+            echo "Incremented patch version: $version"
           else
-            echo "version.txt not found."
+            echo "Unsupported branch for versioning."
+            exit 1
           fi
+          echo "VERSION=$version" >> $GITHUB_ENV
+          git tag -a "$version" -m "Release $version"
+          git push --tags
 
   production_tagged_commit:
     runs-on: ubuntu-latest
