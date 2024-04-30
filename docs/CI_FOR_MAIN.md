@@ -10,7 +10,7 @@ This workflow is triggered by any push to or pull request targeting the `main` b
 
 ### Jobs
 
-1. **automation_hello**
+1. **production_workflow**
    - **Trigger**: Runs on every push to or pull request targeting the `main` branch.
    - **Purpose**: Provides initial visibility and traceability by outputting basic information about the workflow, repository, branch, event name, and commit hash.
 
