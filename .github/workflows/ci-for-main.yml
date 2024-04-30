@@ -44,7 +44,7 @@ jobs:
 
   production_pull_request_closed:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,22 +58,22 @@ jobs:
           echo "Closed Pull Request Head Branch: ${{ github.event.pull_request.head.ref }}"
           echo "Closed Pull Request Merge Commit: ${{ github.event.pull_request.head.sha }}"
           echo "Closed Pull Request Merged: ${{ github.event.pull_request.merged }}"
-
       - name: Set Version
         run: |
           if [ -f "${GITHUB_WORKSPACE}/version.txt" ]; then
-            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-            git config --global user.name "${{ github.actor }}"
             version=$(cat "${GITHUB_WORKSPACE}/version.txt")
             echo "Using version from version.txt: $version"
             echo "VERSION=$version" >> $GITHUB_ENV
-            git tag "$version"
-            git push origin $version
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+            git config --global user.name "${{ github.actor }}"
+            git tag -a "$version" -m "Release $version"
+            git push --tags --force-with-lease origin
           else
             echo "version.txt not found."
             exit 1
           fi
-
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
 
   production_tagged_commit:
