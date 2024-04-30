@@ -68,6 +68,8 @@ jobs:
             exit 1
           fi
           echo "VERSION=$version" >> $GITHUB_ENV
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
           git tag -a "$version" -m "Release $version"
           git push --tags
 
