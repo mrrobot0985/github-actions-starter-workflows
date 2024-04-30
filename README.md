@@ -1,6 +1,13 @@
 # github-actions-starter-workflows
 
-This repository contains various Continuous Integration (.github/workflows/ci) workflows for different branches and scenarios.
+<div style="display: flex; align-items: center;">
+    <div style="flex-shrink: 0; margin-right: 20px; text-align: center;">
+        <img src="https://avatars.githubusercontent.com/u/164061086?v=4" alt="description of image" width="75" height="75">
+    </div>
+    <div>
+        "Welcome to GitHub Actions Workflow Starters! This repository provides starter templates for setting up Continuous Integration (CI) workflows using GitHub Actions."
+    </div>
+</div>
 
 ## Workflows
 
