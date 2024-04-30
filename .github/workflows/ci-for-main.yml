@@ -5,8 +5,9 @@ on:
     branches:
       - main
     tags:
-      - '*'
+      - 'v*'
   pull_request:
+    types: [opened, synchronize, closed]
     branches:
       - main
 
@@ -37,7 +38,7 @@ jobs:
 
   production_pull_request_closed:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true }}
     steps:
       - name: Print Closed Pull Request Details
         run: |
