@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  automation_hello:
+  production_workflow:
     runs-on: ubuntu-latest
     steps:
       - name: Print Workflow Details
@@ -22,6 +22,7 @@ jobs:
 
   production_pull_request:
     runs-on: ubuntu-latest
+    needs: production_workflow
     if: github.event_name == 'pull_request'
     steps:
       - name: Print Pull Request Details
@@ -35,6 +36,7 @@ jobs:
 
   production_pull_request_closed:
     runs-on: ubuntu-latest
+    needs: production_pull_request
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
     steps:
       - name: Print Closed Pull Request Details
