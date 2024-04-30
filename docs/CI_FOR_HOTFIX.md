@@ -10,20 +10,20 @@ This workflow is triggered by any push to branches that match the `hotfix/**` pa
 
 ### Jobs
 
-1. **automation_hello**
+1. **hotfix_workflow**
    - **Trigger**: Runs on every push to `hotfix/**` branches.
    - **Purpose**: Provides initial visibility and traceability by outputting basic information about the workflow and repository, such as workflow name, repository, branch, event name, and commit hash.
 
-2. **dummy_build**
-   - **Trigger**: Sequentially follows the `automation_hello` job.
+2. **hotfix_build**
+   - **Trigger**: Sequentially follows the `hotfix_workflow` job.
    - **Purpose**: Simulates the build process for hotfix branches, providing a placeholder for where actual build processes would occur.
 
-3. **dummy_test**
-   - **Trigger**: Follows the `dummy_build` job.
+3. **hotfix_test**
+   - **Trigger**: Follows the `hotfix_build` job.
    - **Purpose**: Mimics the testing procedures, crucial for ensuring that hotfixes address critical issues without introducing new problems. It outputs a message indicating simulation of testing procedures.
 
-4. **dummy_code_quality_check**
-   - **Trigger**: Occurs after the `dummy_test` job.
+4. **hotfix_code_quality_check**
+   - **Trigger**: Occurs after the `hotfix_test` job.
    - **Purpose**: Simulates code quality checks to ensure that hotfixes meet the code standards. It outputs a message representing the simulation of code quality assessments.
 
 ## Best Practices and Usage

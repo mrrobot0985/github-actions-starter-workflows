@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  automation_hello:
+  develop_workflow:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +23,7 @@ jobs:
           echo "Commit Hash: ${{ github.sha }}"
 
   pull_request_job:
+    needs: develop_workflow
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
     steps:
@@ -35,6 +36,7 @@ jobs:
 
   pull_request_accepted:
     runs-on: ubuntu-latest
+    needs: pull_request_job
     if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true }}
     steps:
       - uses: actions/checkout@v2
@@ -45,6 +47,7 @@ jobs:
 
   pull_request_declined:
     runs-on: ubuntu-latest
+    needs: pull_request_job
     if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false }}
     steps:
       - uses: actions/checkout@v2

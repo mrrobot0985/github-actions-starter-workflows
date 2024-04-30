@@ -10,7 +10,7 @@ The workflow consists of several jobs, each tailored to handle different aspects
 
 ### Jobs
 
-1. **automation_hello**
+1. **develop_workflow**
    - **Trigger**: This job runs on every push to the `develop` branch.
    - **Purpose**: Outputs basic information about the workflow and the repository, such as the workflow name, repository details, branch triggered on, the event name, and the commit hash. This job aids in transparency and traceability of development actions.
 
