@@ -6,7 +6,7 @@ on:
       - 'release/**'
 
 jobs:
-  automation_hello:
+  release_workflow:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,15 +18,15 @@ jobs:
           echo "Event Name: ${{ github.event_name }}"
           echo "Commit Hash: ${{ github.sha }}"
 
-  dummy_build:
+  release_build:
     runs-on: ubuntu-latest
-    needs: automation_hello
+    needs: release_workflow
     steps:
       - uses: actions/checkout@v4
       - name: Dummy Build Process
         run: echo "Simulating build process for release branch."
 
-  dummy_test:
+  release_test:
     runs-on: ubuntu-latest
     needs: dummy_build
     steps:
@@ -34,7 +34,7 @@ jobs:
       - name: Dummy Testing Process
         run: echo "Simulating testing process for release branch."
 
-  dummy_code_quality_check:
+  release_code_quality_check:
     runs-on: ubuntu-latest
     needs: dummy_test
     steps:
