@@ -67,13 +67,14 @@ jobs:
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
             git config --global user.name "${{ github.actor }}"
             git tag -a "$version" -m "Release $version"
-            git push --tags "https://github.com/${GITHUB_REPOSITORY}.git" HEAD:main
+            git push --tags --force-with-lease origin
           else
             echo "version.txt not found."
             exit 1
           fi
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
 
   production_tagged_commit:
     runs-on: ubuntu-latest
