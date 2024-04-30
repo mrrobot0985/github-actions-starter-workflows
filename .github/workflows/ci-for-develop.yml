@@ -5,9 +5,10 @@ on:
     branches:
       - develop
   pull_request:
+    types: [opened, synchronize, closed]
     branches:
       - develop
-      
+
 jobs:
   automation_hello:
     runs-on: ubuntu-latest
@@ -23,11 +24,31 @@ jobs:
 
   pull_request_job:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
       - name: Pull Request Job Execution
         run: |
           echo "Running additional checks for PR to develop branch"
           echo "PR Title: ${{ github.event.pull_request.title }}"
           echo "PR Body: ${{ github.event.pull_request.body }}"
+
+  pull_request_accepted:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Handle Merged Pull Request
+        run: |
+          echo "Pull Request was merged successfully."
+          echo "Merged PR Title: ${{ github.event.pull_request.title }}"
+
+  pull_request_declined:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Handle Declined Pull Request
+        run: |
+          echo "Pull Request was closed without merging."
+          echo "Declined PR Title: ${{ github.event.pull_request.title }}"
