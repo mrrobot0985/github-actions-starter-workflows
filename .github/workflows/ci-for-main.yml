@@ -51,26 +51,14 @@ jobs:
           echo "Closed Pull Request Merged: ${{ github.event.pull_request.merged }}"
       - name: Set Version
         run: |
-          if [ -n "$GITHUB_WORKSPACE" ]; then
-            cd "$GITHUB_WORKSPACE" || exit 1
-          else
-            echo "Error: No workspace found."
-            exit 1
-          fi
-
           if [[ "${{ github.event.pull_request.head.ref }}" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            if git show-ref --verify --quiet "refs/heads/${{ github.event.pull_request.head.ref }}"; then
-              version=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/release\/v//')
-              echo "Using version from branch name: $version"
-            else
-              echo "Error: Branch ${github.event.pull_request.head.ref} not found in the repository."
-              exit 1
-            fi
-          elif [ -f "version.txt" ]; then
-            version=$(cat version.txt)
+            version=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/release\/v//')
+            echo "Using version from branch name: $version"
+          elif [ -f "${GITHUB_WORKSPACE}/version.txt" ]; then
+            version=$(cat "${GITHUB_WORKSPACE}/version.txt")
             echo "Using version from version.txt: $version"
           elif [[ "${{ github.event.pull_request.head.ref }}" == hotfix/* ]]; then
-            version=$(cat version.txt)
+            version=$(cat "${GITHUB_WORKSPACE}/version.txt")
             IFS='.' read -ra parts <<< "$version"
             patch="${parts[2]}"
             next_patch=$((patch + 1))
