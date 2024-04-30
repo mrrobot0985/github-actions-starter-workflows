@@ -35,7 +35,7 @@ jobs:
 
   production_pull_request_closed:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
     steps:
       - name: Print Closed Pull Request Details
         run: |
@@ -46,3 +46,24 @@ jobs:
           echo "Closed Pull Request Head Branch: ${{ github.event.pull_request.head.ref }}"
           echo "Closed Pull Request Merge Commit: ${{ github.event.pull_request.head.sha }}"
           echo "Closed Pull Request Merged: ${{ github.event.pull_request.merged }}"
+      - name: Set Version
+        run: |
+          if [ -f "version.txt" ]; then
+            if [[ "${{ github.event.pull_request.head.ref }}" == release/v*.*.* ]]; then
+              version=$(cat version.txt)
+              echo "Using version from version.txt: $version"
+            elif [[ "${{ github.event.pull_request.head.ref }}" == hotfix/* ]]; then
+              version=$(cat version.txt)
+              IFS='.' read -ra parts <<< "$version"
+              patch="${parts[2]}"
+              next_patch=$((patch + 1))
+              version="${parts[0]}.${parts[1]}.$next_patch"
+              echo "Incremented patch version: $version"
+            else
+              echo "Unsupported branch for versioning."
+              exit 1
+            fi
+            echo "VERSION=$version" >> $GITHUB_ENV
+          else
+            echo "version.txt not found."
+          fi
