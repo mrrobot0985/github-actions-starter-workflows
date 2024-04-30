@@ -9,7 +9,7 @@ jobs:
   automation_hello:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Print Workflow Details
         run: |
           echo "Workflow Name: ${{ github.workflow }}"
