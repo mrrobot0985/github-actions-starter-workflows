@@ -38,6 +38,18 @@ jobs:
             echo "Set initial version to v0.0.0"
           fi
 
+      - name: Determine Latest Tag
+        id: latest-tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag | sort -V | tail -n1)
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          
+      - name: Retrieve commit messages from last tag to HEAD
+        run: |
+          echo "Commit messages from tag ${{ steps.latest-tag.outputs.tag }} to HEAD:"
+          git log ${{ steps.latest-tag.outputs.tag }}..HEAD --oneline
+
       - name: Analyze commit messages
         run: |
           echo "minor_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'feat:')" >> $GITHUB_ENV
