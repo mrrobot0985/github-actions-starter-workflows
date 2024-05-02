@@ -90,6 +90,7 @@ jobs:
 
       - name: Apply version change
         run: |
+          echo "Version change from: $LATEST_TAG"
           if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
@@ -107,6 +108,7 @@ jobs:
 
       - name: Calculate next version
         run: |
+          echo "Calculate from version: $LATEST_TAG"
           MAJOR=0
           MINOR=0
           PATCH=0
