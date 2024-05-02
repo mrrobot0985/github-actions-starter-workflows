@@ -55,9 +55,9 @@ jobs:
           echo "minor_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'feat:')" >> $GITHUB_ENV
           echo "patch_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'fix:')" >> $GITHUB_ENV
           echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
-          echo "minor_count: ${minor_count}"
-          echo "patch_count: ${path_count}"
-          echo "breaking_count: ${breaking_count}"
+          echo "minor_count: $minor_count"
+          echo "patch_count: $path_count"
+          echo "breaking_count: $breaking_count"
 
       # - name: Fetch PR labels and determine version bump
       #   if: ${{ github.event_name == 'pull_request' }}
