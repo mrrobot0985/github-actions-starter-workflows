@@ -87,6 +87,11 @@ jobs:
           else
             echo "No version change required."
         shell: bash
+        env:
+          minor_count: ${{ env.minor_count }}
+          patch_count: ${{ env.patch_count }}
+          breaking_count: ${{ env.breaking_count }}
+
 
       - name: Calculate next version
         run: |
