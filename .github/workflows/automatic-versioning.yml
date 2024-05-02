@@ -149,16 +149,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: version_and_build_info
-          path: |
-            artifacts/${{ github.ref }}/version.txt
-            artifacts/${{ github.ref }}/build.json
+          path: artifacts/${{ github.ref }}/
           retention-days: 5
           overwrite: true
 
       - name: Print new version
         run: |
           echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)\n\n"
-          echo "$(cat artifacts/${{ github_ref }}/build.json)"
+          cat artifacts/${{ github_ref }}/build.json
 
 
       # Future steps to include source code analysis before finalizing version
