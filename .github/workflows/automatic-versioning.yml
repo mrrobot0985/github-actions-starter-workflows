@@ -8,34 +8,23 @@ on:
   pull_request:
     branches:
       - main
-      - develop 
+      - develop
   workflow_dispatch:
 
 jobs:
   versioning:
-    name: Detect Next Version
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
-          token: ${{ secrets.PAT_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-
-      - name: Install Pydantic
-        run: pip install pydantic
-
-      - name: Configure Git
-        run: python github_workflow.py --config-git
-
-      - name: Fetch and Process Tags and Commits
-        run: python github_workflow.py --process-tags
+          python-version: '3.9'
 
       - name: Fetch PR Labels if Pull Request
         if: ${{ github.event_name == 'pull_request' }}
@@ -49,14 +38,13 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.issue.number
             });
-            return labels.data.map(label => label.name).join(' ');
+            return labels.data.map(label => label.name).join(',');
 
-      - name: Determine Version Bump
-        run: python github_workflow.py --determine-bump "${{ steps.fetch-labels.outputs.result }}"
+      - name: Determine and Write Version Details
+        run: python github_workflow.py "${{ github.ref_name }}" "${{ steps.fetch-labels.outputs.result }}"
 
-      - name: Print Resulting Version Bump
-        run: echo "Resulting Version Bump ${{ env.VERSION_BUMP }}"
-
+      - name: Display Version Details
+        run: cat .artifacts/${{ github.ref_name }}/version_details.json
 
 
 

@@ -1,9 +1,23 @@
 import sys
-from pydantic import BaseModel
-from subprocess import check_output, CalledProcessError
+import os
+import subprocess
+from datetime import datetime
+from pydantic import BaseModel, Field
+import json
 
-class VersionBump(BaseModel):
+class CommitDetail(BaseModel):
+    message: str
+    author: str
+    email: str
+    date: datetime
+
+class VersionDetails(BaseModel):
+    current_version: str
+    next_version: str
     bump_type: str
+    commit_messages: list[CommitDetail]
+    tags: list[str]
+    pr_labels: list[str] = []
 
 class GithubWorkflow:
     def __init__(self):
@@ -11,68 +25,65 @@ class GithubWorkflow:
         self.patch_count = 0
         self.breaking_count = 0
 
-    def set_git_config(self, email: str, name: str):
-        try:
-            check_output(['git', 'config', '--global', 'user.email', email])
-            check_output(['git', 'config', '--global', 'user.name', name])
-            return {"status": "success", "message": "Git config set successfully"}
-        except CalledProcessError as e:
-            return {"status": "error", "message": str(e)}
-
     def fetch_tags(self):
-        try:
-            check_output(['git', 'fetch', '--tags'])
-            return {"status": "success", "message": "Tags fetched successfully"}
-        except CalledProcessError as e:
-            return {"status": "error", "message": str(e)}
+        return subprocess.check_output(['git', 'tag'], text=True).strip().split()
 
-    def determine_latest_tag(self):
-        try:
-            latest_tag = check_output(['git', 'describe', '--tags', '--abbrev=0']).decode().strip()
-            return {"status": "success", "latest_tag": latest_tag}
-        except CalledProcessError as e:
-            return {"status": "error", "message": "No tags available"}
+    def get_current_version(self):
+        tags = self.fetch_tags()
+        if tags:
+            return sorted(tags, key=lambda x: tuple(map(int, x.strip('v').split('.'))))[-1]
+        return 'v0.0.0'
 
-    def get_commit_messages(self, tag: str):
-        try:
-            commits = check_output(['git', 'log', f'{tag}..HEAD', '--oneline']).decode().strip().split('\n')
-            return {"status": "success", "commits": commits}
-        except CalledProcessError as e:
-            return {"status": "error", "message": str(e)}
-
-    def determine_version_bump(self):
+    def determine_next_version(self, current_version):
+        parts = list(map(int, current_version.strip('v').split('.')))
         if self.breaking_count > 0:
-            bump_type = "Major version bump required."
+            parts[0] += 1
+            parts[1] = 0
+            parts[2] = 0
         elif self.minor_count > 0:
-            bump_type = "Minor version bump required."
+            parts[1] += 1
+            parts[2] = 0
         elif self.patch_count > 0:
-            bump_type = "Patch version bump required."
-        else:
-            bump_type = "No version change required."
-        return VersionBump(bump_type=bump_type)
+            parts[2] += 1
+        return 'v' + '.'.join(map(str, parts))
 
-    def interpret_commits(self, commit_messages):
-        seen_messages = set()
-        for message in commit_messages:
-            if message in seen_messages:
-                continue
-            seen_messages.add(message)
-            if "BREAKING CHANGE" in message:
-                self.breaking_count += 1
-            elif "feat:" in message:
-                self.minor_count += 1
-            elif "fix:" in message:
-                self.patch_count += 1
+    def fetch_commit_messages(self, current_version):
+        commands = ['git', 'log', f'{current_version}..HEAD', '--pretty=format:%H|%an|%ae|%ad|%s']
+        raw_commits = subprocess.check_output(commands, text=True)
+        return [
+            CommitDetail(
+                message=line.split('|')[4],
+                author=line.split('|')[1],
+                email=line.split('|')[2],
+                date=datetime.strptime(line.split('|')[3], '%a %b %d %H:%M:%S %Y %z')
+            ) for line in raw_commits.strip().split('\n') if line
+        ]
+
+    def write_version_details_to_file(self, branch_name, pr_labels=[]):
+        current_version = self.get_current_version()
+        commit_messages = self.fetch_commit_messages(current_version)
+        next_version = self.determine_next_version(current_version)
+        version_details = VersionDetails(
+            current_version=current_version,
+            next_version=next_version,
+            bump_type=self.determine_version_bump(),
+            commit_messages=commit_messages,
+            tags=self.fetch_tags(),
+            pr_labels=pr_labels
+        )
+        directory = f".artifacts/{branch_name}"
+        os.makedirs(directory, exist_ok=True)
+        file_path = os.path.join(directory, "version_details.json")
+        with open(file_path, 'w') as file:
+            file.write(version_details.json(indent=4))
+        return f"Version details written to {file_path}"
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python github_workflow.py '<branch_name>' '<pr_labels>'")
+        sys.exit(1)
+
+    branch_name = sys.argv[1]
+    pr_labels = sys.argv[2].split(',') if sys.argv[2] else []
     workflow = GithubWorkflow()
-    print(workflow.set_git_config("email@example.com", "GitHub User"))
-    print(workflow.fetch_tags())
-    latest_tag_info = workflow.determine_latest_tag()
-    print(latest_tag_info)
-    if latest_tag_info['status'] == 'success':
-        commits_info = workflow.get_commit_messages(latest_tag_info['latest_tag'])
-        print(commits_info)
-        if commits_info['status'] == 'success':
-            workflow.interpret_commits([c.split(' ', 1)[1] if ' ' in c else c for c in commits_info['commits']])
-    print(workflow.determine_version_bump().json())
+    print(workflow.write_version_details_to_file(branch_name, pr_labels))
