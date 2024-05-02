@@ -12,25 +12,32 @@ on:
 
 jobs:
   versioning:
+    name: Detect Next Version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Necessary to fetch all tags and history for analysis
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Git Config
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
 
       - name: Fetch all tags
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
-      # - name: Set up initial tag if none exist
-      #   run: |
-      #     if [ -z "$(git tag)" ]; then
-      #       git config --global user.email "action@github.com"
-      #       git config --global user.name "GitHub Action"
-      #       git tag v0.0.0
-      #       git push origin v0.0.0
-      #       echo "Set initial version to v0.0.0"
-      #     fi
+      - name: Set up initial tag if none exist
+        run: |
+          if [ -z "$(git tag)" ]; then
+            git config --global user.email "action@github.com"
+            git config --global user.name "GitHub Action"
+            git tag v0.0.0
+            git push origin v0.0.0
+            echo "Set initial version to v0.0.0"
+          fi
 
       - name: Analyze commit messages
         id: commits
