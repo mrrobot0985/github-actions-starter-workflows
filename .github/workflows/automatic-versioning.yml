@@ -36,6 +36,7 @@ jobs:
             git config --global user.name "${{ github.actor }}"
 
       - name: Set up initial tag if none exist
+        id: initial_tag
         needs: git_config
         run: |
           if [ -z "$(git tag)" ]; then
