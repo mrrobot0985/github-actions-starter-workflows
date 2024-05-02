@@ -140,16 +140,25 @@ jobs:
       - name: Save version to version.txt
         run: echo "${{ env.NEW_TAG }}" > artifacts/${{ github.ref }}/version.txt
 
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT" > artifacts/${{ github.ref }}/build.json
+
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
         with:
-          name: version
-          path: artifacts/${{ github.ref }}/version.txt
+          name: version_and_build_info
+          path: |
+            artifacts/${{ github.ref }}/version.txt
+            artifacts/${{ github.ref }}/build.json
           retention-days: 5
           overwrite: true
 
       - name: Print new version
         run: |
-          echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)"
+          echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)\n\n"
+          echo "$(cat artifacts/${{ github_ref }}/build.json)"
+
 
       # Future steps to include source code analysis before finalizing version
