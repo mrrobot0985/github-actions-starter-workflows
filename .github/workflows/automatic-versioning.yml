@@ -49,7 +49,7 @@ jobs:
             return labels.data.map(label => label.name).join(',');
 
       - name: Write Version Details
-        run: python github_workflow.py --branch-name ${{ github.ref_name }} --pr-labels ${{ steps.fetch-labels.outputs.result }}
+        run: python github_workflow.py --branch-name ${{ github.ref_name }} --pr-labels "${{ steps.fetch-labels.outputs.result || '' }}"
 
       - name: Display Version Details
         run: cat .artifacts/${{ github.ref_name }}/version_details.json
