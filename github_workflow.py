@@ -25,6 +25,11 @@ class GithubWorkflow:
         self.patch_count = 0
         self.breaking_count = 0
 
+    def set_git_config(self, email, name):
+        subprocess.check_call(['git', 'config', '--global', 'user.email', email])
+        subprocess.check_call(['git', 'config', '--global', 'user.name', name])
+        return "Git configuration set successfully."
+
     def fetch_tags(self):
         try:
             return subprocess.check_output(['git', 'tag'], text=True).strip().split()
@@ -96,15 +101,18 @@ class GithubWorkflow:
 
     def process_arguments(self):
         parser = argparse.ArgumentParser(description="Manage GitHub workflow tasks.")
+        parser.add_argument('--config-git', action='store_true', help='Configure Git with default user details.')
         parser.add_argument('--branch-name', type=str, required=True, help='The branch name for file paths.')
         parser.add_argument('--pr-labels', type=str, default='', help='Comma-separated PR labels.')
         args = parser.parse_args()
-        print(self.write_version_details_to_file(args.branch_name, args.pr_labels))
 
-    def set_git_config(self, email, name):
-        subprocess.check_call(['git', 'config', '--global', 'user.email', email])
-        subprocess.check_call(['git', 'config', '--global', 'user.name', name])
-        print("Git configuration set successfully.")
+
+        if args.config_git:
+            print(self.set_git_config("user@example.com", "GitHub User"))
+        elif args.branch_name:
+            print(self.write_version_details_to_file(args.branch_name, args.pr_labels))
+        else:
+            parser.error("Branch name is required for versioning tasks unless configuring git.")
 
 if __name__ == "__main__":
     workflow = GithubWorkflow()
