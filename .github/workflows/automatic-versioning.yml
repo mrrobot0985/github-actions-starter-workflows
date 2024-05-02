@@ -78,14 +78,15 @@ jobs:
 
       - name: Apply version change
         run: |
-          if ${{ steps.label_analysis.outputs.major }}; then
+          if [ "${{ env.breaking_count }}" -gt 0 ]; then
             echo "Major version bump required."
-          elif ${{ steps.label_analysis.outputs.minor }}; then
+          elif [ "${{ env.minor_count }}" -gt 0 ]; then
             echo "Minor version bump required."
-          elif ${{ steps.label_analysis.outputs.patch }}; then
+          elif [ "${{ env.patch_count }}" -gt 0 ]; then
             echo "Patch version bump required."
           else
             echo "No version change required."
+        shell: bash
 
       - name: Calculate next version
         run: |
