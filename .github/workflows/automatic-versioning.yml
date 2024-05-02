@@ -16,30 +16,36 @@ jobs:
   versioning:
     name: Detect Next Version
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN=${{ secrets.PAT_TOKEN }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Necessary to fetch all tags and history for analysis
-          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Fetch all tags
+        id: all_tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Git Config
+        id: git_config
         run: |
-
-      - name: Set up initial tag if none exist
-        run: |
-          if [ -z "$(git tag)" ]; then
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
             git config --global user.name "${{ github.actor }}"
+
+      - name: Set up initial tag if none exist
+        needs: git_config
+        run: |
+          if [ -z "$(git tag)" ]; then
             git tag v0.0.0
             git push origin v0.0.0
             echo "Set initial version to v0.0.0"
           fi
 
-      - name: Fetch all tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-
       - name: Analyze commit messages
+        needs: git_config
         id: commits
         run: |
           echo "minor_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'feat:')" >> $GITHUB_ENV
@@ -47,6 +53,7 @@ jobs:
           echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
 
       - name: Fetch PR labels and determine version bump
+        needs: all_tags
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
         id: label_analysis
@@ -76,7 +83,6 @@ jobs:
             core.setOutput('patch', hasBug || hasDocumentation || hasDuplicate || hasGoodFirstIssue || hasHelpWanted || hasInvalid || hasQuestion || hasWontFix);
             core.setOutput('minor', hasEnhancement);
             core.setOutput('major', false); // Adjust according to your needs for breaking changes
-          token: "${{ secrets.PAT_TOKEN }}"
 
       - name: Apply version change
         run: |
