@@ -159,6 +159,6 @@ jobs:
 
       - name: Print build information
         run: |
-          echo "New Version: $(cat artifacts/${{ github.ref }}/build.json)"
+          echo "$(cat artifacts/${{ github.ref }}/build.json)"
 
       # Future steps to include source code analysis before finalizing version
