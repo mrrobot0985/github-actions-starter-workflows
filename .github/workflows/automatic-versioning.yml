@@ -80,6 +80,7 @@ jobs:
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
       - name: Print new version
-        run: echo "New Version: $NEW_TAG"
+        run: |
+          echo "New Version: $NEW_TAG"
 
       # Future steps to include source code analysis before finalizing version
