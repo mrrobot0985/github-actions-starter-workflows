@@ -95,55 +95,24 @@ jobs:
           echo "Version change from: ${{ env.LATEST_TAG }}"
           if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
+            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             echo "Minor version bump required."
+            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
           elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             echo "Patch version bump required."
+            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
           else
             echo "No version change required."
+            NEW_VERSION=${{ env.LATEST_TAG }}
           fi
-        shell: bash
-        env:
-          minor_count: ${{ env.minor_count }}
-          patch_count: ${{ env.patch_count }}
-          breaking_count: ${{ env.breaking_count }}
-
-      - name: Calculate next version
-        run: |
-          echo "Calculate from version: ${{ env.LATEST_TAG }}"
-          MAJOR=0
-          MINOR=0
-          PATCH=0
-          LAST_TAG=$(git describe --tags --abbrev=0 --always)
-          if [[ $LAST_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-            MAJOR=${BASH_REMATCH[1]}
-            MINOR=${BASH_REMATCH[2]}
-            PATCH=${BASH_REMATCH[3]}
-          fi
-          # Logic to increment versions
-          if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
-            MAJOR=$((MAJOR + 1))
-            MINOR=0
-            PATCH=0
-          elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
-            MINOR=$((MINOR + 1))
-            PATCH=0
-          elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
-            PATCH=$((PATCH + 1))
-          fi
-          NEW_TAG="v$MAJOR.$MINOR.$PATCH"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Create artifacts directory
         run: mkdir -p artifacts/${{ github.ref }}
 
       - name: Save version to version.txt
-        run: echo "${{ env.NEW_TAG }}" > artifacts/${{ github.ref }}/version.txt
-
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT" > artifacts/${{ github.ref }}/build.json
+        run: echo "${{ env.NEW_VERSION }}" > artifacts/${{ github.ref }}/version.txt
 
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
@@ -156,9 +125,5 @@ jobs:
       - name: Print new version
         run: |
           echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)"
-
-      - name: Print build information
-        run: |
-          echo "$(cat artifacts/${{ github.ref }}/build.json)"
 
       # Future steps to include source code analysis before finalizing version
