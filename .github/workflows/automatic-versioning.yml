@@ -19,15 +19,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Ensure all history is checked out
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.10'  # Updated to use Python 3.10
 
-      - name: Install Pydantic
-        run: pip install pydantic
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pydantic
 
       - name: Configure Git
         run: python github_workflow.py --config-git
@@ -37,7 +39,7 @@ jobs:
         id: fetch-labels
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const labels = await github.rest.issues.listLabelsOnIssue({
               owner: context.repo.owner,
@@ -46,13 +48,32 @@ jobs:
             });
             return labels.data.map(label => label.name).join(',');
 
-      - name: Determine and Write Version Details
-        run: python github_workflow.py "${{ github.ref_name }}" "${{ steps.fetch-labels.outputs.result }}"
+      - name: Write Version Details
+        run: python github_workflow.py --branch-name ${{ github.ref_name }} --pr-labels ${{ steps.fetch-labels.outputs.result }}
 
       - name: Display Version Details
         run: cat .artifacts/${{ github.ref_name }}/version_details.json
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-details
+          path: .artifacts/${{ github.ref_name }}/version_details.json
 
+  # Example of another job that uses the artifact
+  artifact-consumer:
+    needs: versioning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: version-details
+
+      - name: Use Version Details
+        run: |
+          cat version_details.json
+          # Add steps to use the version details as needed
 
 
       # - name: Fetch all tags

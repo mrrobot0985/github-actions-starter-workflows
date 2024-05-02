@@ -1,9 +1,9 @@
 import sys
 import os
 import subprocess
+import argparse
 from datetime import datetime
-from pydantic import BaseModel, Field
-import json
+from pydantic import BaseModel
 
 class CommitDetail(BaseModel):
     message: str
@@ -17,7 +17,7 @@ class VersionDetails(BaseModel):
     bump_type: str
     commit_messages: list[CommitDetail]
     tags: list[str]
-    pr_labels: list[str] = []
+    pr_labels: list[str]
 
 class GithubWorkflow:
     def __init__(self):
@@ -37,14 +37,14 @@ class GithubWorkflow:
     def determine_next_version(self, current_version):
         parts = list(map(int, current_version.strip('v').split('.')))
         if self.breaking_count > 0:
-            parts[0] += 1
-            parts[1] = 0
-            parts[2] = 0
+            parts[0] += 1  # Major increment
+            parts[1] = 0  # Minor reset
+            parts[2] = 0  # Patch reset
         elif self.minor_count > 0:
-            parts[1] += 1
-            parts[2] = 0
+            parts[1] += 1  # Minor increment
+            parts[2] = 0  # Patch reset
         elif self.patch_count > 0:
-            parts[2] += 1
+            parts[2] += 1  # Patch increment
         return 'v' + '.'.join(map(str, parts))
 
     def fetch_commit_messages(self, current_version):
@@ -66,10 +66,10 @@ class GithubWorkflow:
         version_details = VersionDetails(
             current_version=current_version,
             next_version=next_version,
-            bump_type=self.determine_version_bump(),
+            bump_type="Major" if self.breaking_count > 0 else "Minor" if self.minor_count > 0 else "Patch" if self.patch_count > 0 else "None",
             commit_messages=commit_messages,
             tags=self.fetch_tags(),
-            pr_labels=pr_labels
+            pr_labels=pr_labels.split(',')
         )
         directory = f".artifacts/{branch_name}"
         os.makedirs(directory, exist_ok=True)
@@ -78,12 +78,23 @@ class GithubWorkflow:
             file.write(version_details.json(indent=4))
         return f"Version details written to {file_path}"
 
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python github_workflow.py '<branch_name>' '<pr_labels>'")
-        sys.exit(1)
+    def process_arguments(self):
+        parser = argparse.ArgumentParser(description="Manage GitHub workflow tasks.")
+        parser.add_argument('--config-git', action='store_true', help='Configure Git with default user details.')
+        parser.add_argument('--branch-name', type=str, help='The branch name for file paths.')
+        parser.add_argument('--pr-labels', type=str, default='', help='Comma-separated PR labels.')
+        args = parser.parse_args()
 
-    branch_name = sys.argv[1]
-    pr_labels = sys.argv[2].split(',') if sys.argv[2] else []
+        if args.config_git:
+            self.set_git_config("user@example.com", "GitHub User")
+        elif args.branch_name:
+            print(self.write_version_details_to_file(args.branch_name, args.pr_labels))
+
+    def set_git_config(self, email, name):
+        subprocess.check_call(['git', 'config', '--global', 'user.email', email])
+        subprocess.check_call(['git', 'config', '--global', 'user.name', name])
+        print("Git configuration set successfully.")
+
+if __name__ == "__main__":
     workflow = GithubWorkflow()
-    print(workflow.write_version_details_to_file(branch_name, pr_labels))
+    workflow.process_arguments()
