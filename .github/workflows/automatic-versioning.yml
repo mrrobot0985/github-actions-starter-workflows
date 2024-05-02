@@ -10,6 +10,7 @@ on:
       - main
       - develop 
     # types: [closed]
+  workflow_dispatch:
 
 jobs:
   versioning:
@@ -45,20 +46,48 @@ jobs:
           echo "patch_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'fix:')" >> $GITHUB_ENV
           echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
 
-      - name: Fetch PR labels if pull request
+      - name: Fetch PR labels and determine version bump
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
+        id: label_analysis
         with:
           script: |
             const payload = context.payload.pull_request
-            const labels = payload.labels.map(label => label.name)
-            console.log(labels)
-            const hasFeature = labels.includes('feature')
-            const hasBug = labels.includes('bug')
-            const hasBreaking = labels.includes('breaking')
-            core.setOutput('feature', hasFeature)
-            core.setOutput('bug', hasBug)
-            core.setOutput('breaking', hasBreaking)
+            const labels = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: payload.number
+            });
+            const labelNames = labels.data.map(label => label.name);
+            console.log("PR labels:", labelNames);
+
+            // Determine version changes based on labels
+            const hasBug = labelNames.includes('bug');
+            const hasDocumentation = labelNames.includes('documentation');
+            const hasEnhancement = labelNames.includes('enhancement');
+            const hasDuplicate = labelNames.includes('duplicate');
+            const hasGoodFirstIssue = labelNames.includes('good first issue');
+            const hasHelpWanted = labelNames.includes('help wanted');
+            const hasInvalid = labelNames.includes('invalid');
+            const hasQuestion = labelNames.includes('question');
+            const hasWontFix = labelNames.includes('wontfix');
+
+            // Set outputs for later steps
+            core.setOutput('patch', hasBug || hasDocumentation || hasDuplicate || hasGoodFirstIssue || hasHelpWanted || hasInvalid || hasQuestion || hasWontFix);
+            core.setOutput('minor', hasEnhancement);
+            core.setOutput('major', false); // Adjust according to your needs for breaking changes
+          token: "${{ secrets.PAT_TOKEN }}"
+
+      - name: Apply version change
+        run: |
+          if ${{ steps.label_analysis.outputs.major }}; then
+            echo "Major version bump required."
+          elif ${{ steps.label_analysis.outputs.minor }}; then
+            echo "Minor version bump required."
+          elif ${{ steps.label_analysis.outputs.patch }}; then
+            echo "Patch version bump required."
+          else
+            echo "No version change required."
 
       - name: Calculate next version
         run: |
