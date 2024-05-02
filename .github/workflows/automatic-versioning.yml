@@ -141,7 +141,7 @@ jobs:
         run: echo "${{ env.NEW_TAG }}" > artifacts/${{ github.ref }}/version.txt
 
       - name: Store version in artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: version
           path: artifacts/${{ github.ref }}/version.txt
