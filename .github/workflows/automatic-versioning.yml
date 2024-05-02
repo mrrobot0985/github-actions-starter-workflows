@@ -86,6 +86,7 @@ jobs:
             echo "Patch version bump required."
           else
             echo "No version change required."
+          fi
         shell: bash
         env:
           minor_count: ${{ env.minor_count }}
