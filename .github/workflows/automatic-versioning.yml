@@ -46,7 +46,7 @@ jobs:
 
       - name: Analyze commit messages and determine version bump
         run: |
-          python x.py ${{ env.minor_count }} ${{ env.patch_count }} ${{ env.breaking_count }}
+          python X.py ${{ env.minor_count }} ${{ env.patch_count }} ${{ env.breaking_count }}
         env:
           minor_count: 1   # Example static values, replace with dynamic values as needed
           patch_count: 2
