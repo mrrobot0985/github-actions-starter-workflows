@@ -1,0 +1,85 @@
+name: Automated Versioning
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necessary to fetch all tags and history for analysis
+
+      - name: Fetch all tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      # - name: Set up initial tag if none exist
+      #   run: |
+      #     if [ -z "$(git tag)" ]; then
+      #       git config --global user.email "action@github.com"
+      #       git config --global user.name "GitHub Action"
+      #       git tag v0.0.0
+      #       git push origin v0.0.0
+      #       echo "Set initial version to v0.0.0"
+      #     fi
+
+      - name: Analyze commit messages
+        id: commits
+        run: |
+          echo "minor_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'feat:')" >> $GITHUB_ENV
+          echo "patch_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'fix:')" >> $GITHUB_ENV
+          echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
+
+      - name: Fetch PR labels if pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const payload = context.payload.pull_request
+            const labels = payload.labels.map(label => label.name)
+            console.log(labels)
+            const hasFeature = labels.includes('feature')
+            const hasBug = labels.includes('bug')
+            const hasBreaking = labels.includes('breaking')
+            core.setOutput('feature', hasFeature)
+            core.setOutput('bug', hasBug)
+            core.setOutput('breaking', hasBreaking)
+
+      - name: Calculate next version
+        run: |
+          MAJOR=0
+          MINOR=0
+          PATCH=0
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          if [[ $LAST_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            MAJOR=${BASH_REMATCH[1]}
+            MINOR=${BASH_REMATCH[2]}
+            PATCH=${BASH_REMATCH[3]}
+          fi
+          # Logic to increment versions
+          if [ "${{ env.breaking_count }}" -gt 0 ] || ${{ steps.pr_labels.outputs.breaking }}; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "${{ env.minor_count }}" -gt 0 ] || ${{ steps.pr_labels.outputs.feature }}; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          elif [ "${{ env.patch_count }}" -gt 0 ] || ${{ steps.pr_labels.outputs.bug }}; then
+            PATCH=$((PATCH + 1))
+          fi
+          NEW_TAG="v$MAJOR.$MINOR.$PATCH"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Print new version
+        run: echo "New Version: $NEW_TAG"
+
+      # Future steps to include source code analysis before finalizing version
