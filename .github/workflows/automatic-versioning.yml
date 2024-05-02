@@ -155,8 +155,10 @@ jobs:
 
       - name: Print new version
         run: |
-          echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)\n\n"
-          cat artifacts/${{ github_ref }}/build.json
+          echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)"
 
+      - name: Print build information
+        run: |
+          echo "New Version: $(cat artifacts/${{ github.ref }}/build.json)"
 
       # Future steps to include source code analysis before finalizing version
