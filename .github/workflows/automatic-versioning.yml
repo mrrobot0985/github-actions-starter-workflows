@@ -46,7 +46,7 @@ jobs:
           echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
 
       - name: Fetch PR labels if pull request
-        if: github.event_name == 'pull_request'
+        if:${{github.event_name}} == 'pull_request'
         uses: actions/github-script@v6
         with:
           script: |
