@@ -55,7 +55,7 @@ jobs:
         run: python github_workflow.py --determine-bump "${{ steps.fetch-labels.outputs.result }}"
 
       - name: Print Resulting Version Bump
-        run: echo "Resulting Version Bump: ${{ env.VERSION_BUMP }}"
+        run: echo "Resulting Version Bump ${{ env.VERSION_BUMP }}"
 
 
 
