@@ -145,6 +145,8 @@ jobs:
         with:
           name: version
           path: artifacts/${{ github.ref }}/version.txt
+          retention-days: 5
+          overwrite: true
 
       - name: Print new version
         run: |
