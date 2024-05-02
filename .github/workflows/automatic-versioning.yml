@@ -90,11 +90,11 @@ jobs:
 
       - name: Apply version change
         run: |
-          if [ "${{ env.breaking_count }}" -gt 0 ]; then
+          if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
-          elif [ "${{ env.minor_count }}" -gt 0 ]; then
+          elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             echo "Minor version bump required."
-          elif [ "${{ env.patch_count }}" -gt 0 ]; then
+          elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             echo "Patch version bump required."
           else
             echo "No version change required."
@@ -117,14 +117,14 @@ jobs:
             PATCH=${BASH_REMATCH[3]}
           fi
           # Logic to increment versions
-          if [ "${{ env.breaking_count }}" -gt 0 ]; then
+          if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             MAJOR=$((MAJOR + 1))
             MINOR=0
             PATCH=0
-          elif [ "${{ env.minor_count }}" -gt 0 ]; then
+          elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             MINOR=$((MINOR + 1))
             PATCH=0
-          elif [ "${{ env.patch_count }}" -gt 0 ]; then
+          elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             PATCH=$((PATCH + 1))
           fi
           NEW_TAG="v$MAJOR.$MINOR.$PATCH"
