@@ -47,11 +47,13 @@ jobs:
 
       - name: Retrieve commit messages from last tag to HEAD
         run: |
+          echo "Retrieve commit messages from ${{ env.LATEST_TAG }} to HEAD"
           echo "Commit messages from tag ${{ steps.latest-tag.outputs.tag }} to HEAD:"
           git log ${{ steps.latest-tag.outputs.tag }}..HEAD --oneline
 
       - name: Analyze commit messages
         run: |
+          echo "Analyze commit messages on: ${{ env.LATEST_TAG }}"
           echo "minor_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'feat:')" >> $GITHUB_ENV
           echo "patch_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'fix:')" >> $GITHUB_ENV
           echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
@@ -90,7 +92,7 @@ jobs:
 
       - name: Apply version change
         run: |
-          echo "Version change from: $LATEST_TAG"
+          echo "Version change from: ${{ env.LATEST_TAG }}"
           if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
@@ -108,7 +110,7 @@ jobs:
 
       - name: Calculate next version
         run: |
-          echo "Calculate from version: $LATEST_TAG"
+          echo "Calculate from version: ${{ env.LATEST_TAG }}"
           MAJOR=0
           MINOR=0
           PATCH=0
@@ -132,8 +134,20 @@ jobs:
           NEW_TAG="v$MAJOR.$MINOR.$PATCH"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
+      - name: Create artifacts directory
+        run: mkdir -p artifacts/${{ github.ref }}
+
+      - name: Save version to version.txt
+        run: echo "${{ env.NEW_TAG }}" > artifacts/${{ github.ref }}/version.txt
+
+      - name: Store version in artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: version
+          path: artifacts/${{ github.ref }}/version.txt
+
       - name: Print new version
         run: |
-          echo "New Version: $NEW_TAG"
+          echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)"
 
       # Future steps to include source code analysis before finalizing version
