@@ -148,7 +148,9 @@ jobs:
 
       # Placeholder steps for building the development version...
       - name: Placeholder for building the development version
-        run: echo "Building the development version..."
+        run: |
+          echo "Building the development version..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
 
   build_rc_beta:
     name: Build Release Candidate / Beta
@@ -172,7 +174,9 @@ jobs:
 
       # Placeholder steps for building the release candidate / beta version...
       - name: Placeholder for building the release candidate / beta version
-        run: echo "Building the release candidate / beta version..."
+        run: |
+          echo "Building the release candidate / beta version..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
 
   build_prod:
     name: Build Production
@@ -196,7 +200,9 @@ jobs:
 
       # Placeholder steps for building the production version...
       - name: Placeholder for building the production version
-        run: echo "Building the production version..."
+        run: |
+          echo "Building the production version..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
 
   pr_checks:
     name: PR Checks
@@ -220,7 +226,9 @@ jobs:
 
       # Placeholder steps for running checks on pull requests...
       - name: Placeholder for running checks on pull requests
-        run: echo "Running checks on pull requests..."
+        run: |
+          echo "Running checks on pull requests..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
 
   release_dev:
     name: Release Development
@@ -238,7 +246,9 @@ jobs:
           path: artifacts/${{ github.ref }}/version.txt
 
       - name: Placeholder for releasing the development version
-        run: echo "Releasing the development version..."
+        run: |
+          echo "Releasing the development version..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
 
   release_rc_beta:
     name: Release Release Candidate / Beta
@@ -256,7 +266,9 @@ jobs:
           path: artifacts/${{ github.ref }}/version.txt
 
       - name: Placeholder for releasing the release candidate / beta version
-        run: echo "Releasing the release candidate / beta version..."
+        run: |
+          echo "Releasing the release candidate / beta version..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
 
   release_prod:
     name: Release Production
@@ -274,4 +286,6 @@ jobs:
           path: artifacts/${{ github.ref }}/version.txt
 
       - name: Placeholder for releasing the production version
-        run: echo "Releasing the production version..."
+        run: |
+          echo "Releasing the production version..."
+          echo "Version Tag: $(cat artifacts/${{ github.ref }}/version.txt)"
