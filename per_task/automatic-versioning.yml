@@ -1,0 +1,129 @@
+name: Automated Versioning
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop 
+  workflow_dispatch:
+
+jobs:
+  versioning:
+    name: Detect Next Version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+          token: ${{ secrets.PAT_TOKEN }}
+      - name: Fetch all tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: Git Config
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Set up initial tag if none exist
+        run: |
+          if [ -z "$(git tag)" ]; then
+            git tag v0.0.0
+            git push origin v0.0.0
+            echo "Set initial version to v0.0.0"
+          fi
+
+      - name: Determine Latest Tag
+        id: latest-tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag | sort -V | tail -n1)
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Retrieve commit messages from last tag to HEAD
+        run: |
+          echo "Retrieve commit messages from ${{ env.LATEST_TAG }} to HEAD"
+          echo "Commit messages from tag ${{ steps.latest-tag.outputs.tag }} to HEAD:"
+          git log ${{ steps.latest-tag.outputs.tag }}..HEAD --oneline
+
+      - name: Analyze commit messages
+        run: |
+          echo "Analyze commit messages on: ${{ env.LATEST_TAG }}"
+          echo "minor_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'feat:')" >> $GITHUB_ENV
+          echo "patch_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'fix:')" >> $GITHUB_ENV
+          echo "breaking_count=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }} | grep -c 'BREAKING CHANGE:')" >> $GITHUB_ENV
+
+      - name: Fetch PR labels and determine version bump
+        id: pull_request_labels
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            const payload = context.payload.pull_request
+            const labels = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: payload.number
+            });
+            const labelNames = labels.data.map(label => label.name);
+            console.log("PR labels:", labelNames);
+
+            // Determine version changes based on labels
+            const hasBug = labelNames.includes('bug');
+            const hasDocumentation = labelNames.includes('documentation');
+            const hasEnhancement = labelNames.includes('enhancement');
+            const hasDuplicate = labelNames.includes('duplicate');
+            const hasGoodFirstIssue = labelNames.includes('good first issue');
+            const hasHelpWanted = labelNames.includes('help wanted');
+            const hasInvalid = labelNames.includes('invalid');
+            const hasQuestion = labelNames.includes('question');
+            const hasWontFix = labelNames.includes('wontfix');
+
+            // Set outputs for later steps
+            core.setOutput('patch', hasBug || hasDocumentation || hasDuplicate || hasGoodFirstIssue || hasHelpWanted || hasInvalid || hasQuestion || hasWontFix);
+            core.setOutput('minor', hasEnhancement);
+            core.setOutput('major', false); // Adjust according to your needs for breaking changes
+
+      - name: Apply version change
+        run: |
+          echo "Version change from: ${{ env.LATEST_TAG }}"
+          if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
+            echo "Major version bump required."
+            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+          elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
+            echo "Minor version bump required."
+            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+          elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
+            echo "Patch version bump required."
+            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+          else
+            echo "No version change required."
+            NEW_VERSION=${{ env.LATEST_TAG }}
+          fi
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create artifacts directory
+        run: mkdir -p artifacts/${{ github.ref }}
+
+      - name: Save version to version.txt
+        run: echo "${{ env.NEW_VERSION }}" > artifacts/${{ github.ref }}/version.txt
+
+      - name: Store version in artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version_and_build_info
+          path: artifacts/${{ github.ref }}/
+          retention-days: 5
+          overwrite: true
+
+      - name: Print new version
+        run: |
+          echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)"
+
+      # Future steps to include source code analysis before finalizing version
