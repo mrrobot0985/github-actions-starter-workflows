@@ -105,7 +105,7 @@ jobs:
               NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
               NEW_MAJOR=$((MAJOR + 1))
-              SEMANTIC_VERSION="${NEW_MAJOR}.${MINOR}.${PATCH}"
+              NEXT_VERSION="${NEW_MAJOR}.${MINOR}.${PATCH}"
             fi
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             echo "Minor version bump required."
@@ -113,7 +113,7 @@ jobs:
               NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
               NEW_MINOR=$((MINOR + 1))
-              SEMANTIC_VERSION="${MAJOR}.${NEW_MINOR}.${PATCH}"
+              NEXT_VERSION="${MAJOR}.${NEW_MINOR}.${PATCH}"
             fi
           elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             echo "Patch version bump required."
@@ -121,7 +121,7 @@ jobs:
               NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
               NEW_PATCH=$((PATCH + 1))
-              SEMANTIC_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+              NEXT_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
             fi
           else
             echo "No version change required."
