@@ -15,6 +15,9 @@ jobs:
   production_workflow:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Print Workflow Details
         run: |
           echo "Workflow Name: CI for Main Branch (Production)"
@@ -27,6 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Print Pull Request Details
         run: |
           echo "Pull Request Number: ${{ github.event.number }}"
@@ -38,8 +44,13 @@ jobs:
 
   production_pull_request_closed:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true }}
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
       - name: Print Closed Pull Request Details
         run: |
           echo "Closed Pull Request Number: ${{ github.event.number }}"
@@ -47,36 +58,32 @@ jobs:
           echo "Closed Pull Request Author: ${{ github.event.pull_request.user.login }}"
           echo "Closed Pull Request Base Branch: ${{ github.event.pull_request.base.ref }}"
           echo "Closed Pull Request Head Branch: ${{ github.event.pull_request.head.ref }}"
-          echo "Closed Pull Request Merge Commit: ${{ github.event.pull_request.head.sha }}"
+          echo "Closed Pull Request Merge Commit: ${{ github.event.pull_request.merge_commit_sha }}"
           echo "Closed Pull Request Merged: ${{ github.event.pull_request.merged }}"
+
       - name: Set Version
+        if: ${{ github.event.pull_request.merged }}
         run: |
-          if [ -f "version.txt" ]; then
-            if [[ "${{ github.event.pull_request.head.ref }}" == release/v*.*.* ]]; then
-              version=$(cat version.txt)
-              echo "Using version from version.txt: $version"
-            elif [[ "${{ github.event.pull_request.head.ref }}" == hotfix/* ]]; then
-              version=$(cat version.txt)
-              IFS='.' read -ra parts <<< "$version"
-              patch="${parts[2]}"
-              next_patch=$((patch + 1))
-              version="${parts[0]}.${parts[1]}.$next_patch"
-              echo "Incremented patch version: $version"
-            else
-              echo "Unsupported branch for versioning."
-              exit 1
-            fi
+          if [ -f "${GITHUB_WORKSPACE}/version.txt" ]; then
+            version=$(cat "${GITHUB_WORKSPACE}/version.txt")
+            echo "Using version from version.txt: $version"
             echo "VERSION=$version" >> $GITHUB_ENV
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+            git config --global user.name "${{ github.actor }}"
             git tag -a "$version" -m "Release $version"
-            git push --tags
+            git push --tags --force-with-lease https://${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
           else
             echo "version.txt not found."
+            exit 1
           fi
 
   production_tagged_commit:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Print Tag Details
         run: |
           echo "Tag: ${{ github.ref }}"
