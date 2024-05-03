@@ -154,7 +154,8 @@ jobs:
         run: |
           # echo "Building the development version..."
           # echo "Version Tag: $(cat artifacts/version.txt)"
-          ls artifacts
+          echo "VERSION=$(cat ./artifacts/version.txt)" >> $GITHUB_ENV
+          echo ${{ env.VERSION }}
 
 
 ################################################################################
