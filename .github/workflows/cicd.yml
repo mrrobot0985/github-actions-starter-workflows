@@ -117,7 +117,7 @@ jobs:
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
         with:
-          name: version_and_build_info
+          name: versioning-artifacts
           path: artifacts/${{ github.ref }}/
           retention-days: 5
           overwrite: true
