@@ -153,8 +153,7 @@ jobs:
       - name: Placeholder for building the development version
         run: |
           echo "Building the development version..."
-          echo "VERSION=$(cat ./artifacts/version.txt)" >> $GITHUB_ENV
-          echo "Version Tag: ${{ env.VERSION }}"
+          echo "Version Tag: $(cat artifacts/version.txt)"
 
 
 ################################################################################
