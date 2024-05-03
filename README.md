@@ -11,3 +11,7 @@ Adding 'feat: dummy feature should bump minor'
 step 2:
 
 Adding 'fix: dummy fix that fixes the made-up unmade hole problem'
+
+step 3: 
+
+Create a feat/dummy-feat-pr branch and see how the pull-request reacts.

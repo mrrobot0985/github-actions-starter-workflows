@@ -166,15 +166,30 @@ jobs:
         env:
           cache: 'none'
 
-###############################################################################
-      # Placeholder steps for building the development version...
-      - name: Placeholder for building the development version
+      # Pre-build information...
+      - name: Building the development version
         run: |
           echo "Building the development version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
 
+      - name: Echo Setup Python Environment
+        run: echo "Setting up Python environment and installing pip..."
 
-################################################################################
+      - name: Echo Install Dependencies
+        run: echo "Installing dependencies using pip from requirements.txt..."
+
+      - name: Echo Run Tests
+        run: echo "Running tests using pytest or similar testing framework..."
+
+      - name: Echo Build Package
+        run: echo "Building Python package using setup.py or poetry build..."
+
+      - name: Echo Package Validation
+        run: echo "Validating the packaged files..."
+
+      - name: Echo Prepare Artifacts
+        run: echo "Preparing artifacts for storage or deployment..."
+
   build_rc_beta:
     name: Build Release Candidate / Beta
     runs-on: ubuntu-latest
@@ -197,12 +212,29 @@ jobs:
         env:
           cache: 'none'
 
-
-      # Placeholder steps for building the release candidate / beta version...
-      - name: Placeholder for building the release candidate / beta version
+      # Pre-build information...
+      - name: Building the release candidate / beta version
         run: |
           echo "Building the release candidate / beta version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+
+      - name: Echo Setup Python Environment
+        run: echo "Setting up Python environment and updating pip to the latest version..."
+
+      - name: Echo Install Dependencies
+        run: echo "Installing dependencies required for the RC/Beta version using pip from requirements.txt..."
+
+      - name: Echo Run Integration Tests
+        run: echo "Running integration tests to ensure system-wide functionalities work as expected..."
+
+      - name: Echo Build RC/Beta Package
+        run: echo "Building the release candidate or beta version of the Python package using setup.py..."
+
+      - name: Echo Validate RC/Beta Build
+        run: echo "Validating the build integrity and compliance with pre-release standards..."
+
+      - name: Echo Prepare RC/Beta Artifacts
+        run: echo "Packaging and preparing artifacts specific to the RC/Beta for next steps in the deployment pipeline..."
 
   build_prod:
     name: Build Production
@@ -227,11 +259,32 @@ jobs:
           cache: 'none'
 
 
-      # Placeholder steps for building the production version...
-      - name: Placeholder for building the production version
+      # Pre-build information...
+      - name: Building the production version
         run: |
           echo "Building the production version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+
+      - name: Echo Setup Python Environment
+        run: echo "Setting up Python environment and ensuring all tools are ready for a production build..."
+
+      - name: Echo Install Production Dependencies
+        run: echo "Installing dependencies required for the production environment using pip from requirements.txt..."
+
+      - name: Echo Run Security and Performance Tests
+        run: echo "Running security checks and performance tests to ensure production readiness..."
+
+      - name: Echo Build Production Package
+        run: echo "Building the production version of the Python package using setup.py or poetry for optimized deployment..."
+
+      - name: Echo Validate Production Build
+        run: echo "Validating the production build for compliance with production standards and requirements..."
+
+      - name: Echo Prepare Production Artifacts
+        run: echo "Finalizing and preparing production artifacts for deployment and release..."
+
+      - name: Echo Archive Artifacts
+        run: echo "Archiving build artifacts for long-term storage and auditability..."
 
   pr_checks:
     name: PR Checks
@@ -256,11 +309,32 @@ jobs:
           cache: 'none'
 
 
-      # Placeholder steps for running checks on pull requests...
-      - name: Placeholder for running checks on pull requests
+      # Pre-check information...
+      - name: Running checks on pull requests
         run: |
           echo "Running checks on pull requests..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+
+      - name: Echo Setup Python Environment
+        run: echo "Setting up Python environment appropriate for PR tests..."
+
+      - name: Echo Install Dependencies for Testing
+        run: echo "Installing dependencies required for running tests on the PR using pip..."
+
+      - name: Echo Run Unit Tests
+        run: echo "Running unit tests to validate changes in the pull request..."
+
+      - name: Echo Run Linting
+        run: echo "Executing linting to ensure code style guidelines are met..."
+
+      - name: Echo Perform Static Code Analysis
+        run: echo "Performing static code analysis to identify potential issues in the PR code..."
+
+      - name: Echo Check for Merge Conflicts
+        run: echo "Checking for any merge conflicts with the base branch..."
+
+      - name: Echo Validate PR Documentation
+        run: echo "Validating that all documentation updates are included and correct..."
 
   release_dev:
     name: Release Development
@@ -279,11 +353,23 @@ jobs:
         env:
           cache: 'none'
 
-
-      - name: Placeholder for releasing the development version
+      # Pre-release information
+      - name: Releasing the development version
         run: |
           echo "Releasing the development version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+
+      - name: Echo Finalize Development Release
+        run: echo "Finalizing the development release of the Python package..."
+
+      - name: Echo Deploy to Development Environment
+        run: echo "Deploying the Python package to a development environment for internal testing and feedback..."
+
+      - name: Echo Verify Deployment
+        run: echo "Verifying that the deployment in the development environment is successful and operational..."
+
+      - name: Echo Notify Stakeholders
+        run: echo "Notifying stakeholders of the new development release for further evaluation and testing..."
 
   release_rc_beta:
     name: Release Release Candidate / Beta
@@ -302,10 +388,26 @@ jobs:
         env:
           cache: 'none'
 
-      - name: Placeholder for releasing the release candidate / beta version
+      # Pre-release information...
+      - name: Releasing the release candidate / beta version
         run: |
           echo "Releasing the release candidate / beta version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+
+      - name: Echo Finalize RC/Beta Release
+        run: echo "Finalizing the release candidate or beta version of the Python package..."
+
+      - name: Echo Deploy to Staging Environment
+        run: echo "Deploying the release candidate or beta version to a staging environment for pre-release testing..."
+
+      - name: Echo Verify Deployment
+        run: echo "Verifying that the deployment in the staging environment is successful and ready for final user acceptance testing..."
+
+      - name: Echo Conduct Pre-Release Tests
+        run: echo "Conducting pre-release tests to ensure the stability and performance of the RC/Beta version..."
+
+      - name: Echo Notify Stakeholders
+        run: echo "Notifying stakeholders of the new RC/Beta release for final review and approval..."
 
   release_prod:
     name: Release Production
@@ -324,7 +426,22 @@ jobs:
         env:
           cache: 'none'        
 
-      - name: Placeholder for releasing the production version
+      - name: Releasing the production version
         run: |
-          # echo "Releasing the production version..."
-          # echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Releasing the production version..."
+          echo "Version Tag: $(cat artifacts/version.txt)"
+
+      - name: Echo Finalize Production Release
+        run: echo "Finalizing the production version of the Python package..."
+
+      - name: Echo Deploy to Production Environment
+        run: echo "Deploying the production version of the Python package to the production environment..."
+
+      - name: Echo Verify Deployment
+        run: echo "Verifying that the deployment in the production environment is successful and the application is operational..."
+
+      - name: Echo Perform Post-Deployment Checks
+        run: echo "Performing post-deployment checks to ensure full operational capability and performance benchmarks are met..."
+
+      - name: Echo Notify Stakeholders
+        run: echo "Notifying stakeholders and customers of the successful deployment of the new production version..."
