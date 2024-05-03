@@ -90,7 +90,10 @@ jobs:
             core.setOutput('minor', hasEnhancement);
             core.setOutput('major', false); // Adjust according to your needs for breaking changes
 
-      - name: Apply version change
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
+      - name: Determine version change
         run: |
           echo "Version change from: ${{ env.LATEST_TAG }}"
           
@@ -129,15 +132,8 @@ jobs:
           fi
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "SEMANTIC_VERSION=$SEMANTIC_VERSION" >> $GITHUB_ENV
-
-      - name: Create artifacts directory
-        run: mkdir -p artifacts
-
-      - name: Save version to version.txt
-        run: echo "${{ env.NEXT_VERSION }}" > artifacts/version.txt
-
-      - name: Save version to semantic.txt
-        run: echo "${{ env.SEMANTIC_VERSION }}" > artifacts/semantic.txt
+          echo "$NEXT_VERSION" > artifacts/version.txt
+          echo "$SEMANTIC_VERSION" > artifacts/semantic.txt
 
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
