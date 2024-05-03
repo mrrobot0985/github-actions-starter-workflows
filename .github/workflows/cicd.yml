@@ -148,12 +148,16 @@ jobs:
         env:
           cache: 'none'
 
+###############################################################################
       # Placeholder steps for building the development version...
       - name: Placeholder for building the development version
         run: |
-          echo "Building the development version..."
-          echo "Version Tag: $(cat artifacts/version.txt)"
+          # echo "Building the development version..."
+          # echo "Version Tag: $(cat artifacts/version.txt)"
+          ls artifacts
 
+
+################################################################################
   build_rc_beta:
     name: Build Release Candidate / Beta
     runs-on: ubuntu-latest
@@ -307,4 +311,3 @@ jobs:
         run: |
           # echo "Releasing the production version..."
           # echo "Version Tag: $(cat artifacts/version.txt)"
-          ls artifacts
