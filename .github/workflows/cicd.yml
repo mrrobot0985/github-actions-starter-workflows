@@ -95,13 +95,31 @@ jobs:
           echo "Version change from: ${{ env.LATEST_TAG }}"
           if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
-            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+            if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
+              NEW_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
+            elif [ "${{ github.ref }}" == 'refs/heads/release' ]; then
+              NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+            else
+              NEW_VERSION="v$(date +'%Y.%m.%d')-beta-${{ github.run_number }}-${{ github.run_attempt }}"
+            fi
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             echo "Minor version bump required."
-            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+            if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
+              NEW_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
+            elif [ "${{ github.ref }}" == 'refs/heads/release' ]; then
+              NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+            else
+              NEW_VERSION="v$(date +'%Y.%m.%d')-beta-${{ github.run_number }}-${{ github.run_attempt }}"
+            fi
           elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             echo "Patch version bump required."
-            NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+            if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
+              NEW_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
+            elif [ "${{ github.ref }}" == 'refs/heads/release' ]; then
+              NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+            else
+              NEW_VERSION="v$(date +'%Y.%m.%d')-beta-${{ github.run_number }}-${{ github.run_attempt }}"
+            fi
           else
             echo "No version change required."
             NEW_VERSION=${{ env.LATEST_TAG }}
