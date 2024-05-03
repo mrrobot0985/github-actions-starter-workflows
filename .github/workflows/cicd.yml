@@ -140,7 +140,7 @@ jobs:
       - name: Print new version
         run: |
           echo "Next Version: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
   build_dev:
     name: Build Development
@@ -169,7 +169,7 @@ jobs:
         run: |
           echo "Building the development version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment and installing pip..."
@@ -216,7 +216,7 @@ jobs:
         run: |
           echo "Building the release candidate / beta version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment and updating pip to the latest version..."
@@ -264,7 +264,7 @@ jobs:
         run: |
           echo "Building the production version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment and ensuring all tools are ready for a production build..."
@@ -315,7 +315,7 @@ jobs:
         run: |
           echo "Running checks on pull requests..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment appropriate for PR tests..."
@@ -360,7 +360,7 @@ jobs:
         run: |
           echo "Releasing the development version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Finalize Development Release
         run: echo "Finalizing the development release of the Python package..."
@@ -396,7 +396,7 @@ jobs:
         run: |
           echo "Releasing the release candidate / beta version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Finalize RC/Beta Release
         run: echo "Finalizing the release candidate or beta version of the Python package..."
@@ -434,7 +434,7 @@ jobs:
         run: |
           echo "Releasing the production version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
-          echo "Symantic Version: $(cat artifacts/semantic.txt)"
+          echo "Semantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Finalize Production Release
         run: echo "Finalizing the production version of the Python package..."
