@@ -8,3 +8,6 @@ step 1:
 
 Adding 'feat: dummy feature should bump minor'
 
+step 2:
+
+Adding 'fix: dummy fix that fixes the made-up unmade hole problem'
