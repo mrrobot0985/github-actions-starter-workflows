@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - develop
+      - release/*
   pull_request:
     branches:
       - main
-      - develop 
+      - develop
+      - release/*
   workflow_dispatch:
 
 jobs:
@@ -131,9 +133,9 @@ jobs:
             NEXT_VERSION=${{ env.LATEST_TAG }}
           fi
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
-          echo "SEMANTIC_VERSION=$SEMANTIC_VERSION" >> $GITHUB_ENV
-          echo "$NEXT_VERSION" > artifacts/version.txt
-          echo "$SEMANTIC_VERSION" > artifacts/semantic.txt
+
+      - name: Save version to version.txt
+        run: echo "${{ env.NEXT_VERSION }}" > artifacts/version.txt
 
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
