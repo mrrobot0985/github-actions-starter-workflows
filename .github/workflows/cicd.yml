@@ -305,5 +305,6 @@ jobs:
 
       - name: Placeholder for releasing the production version
         run: |
-          echo "Releasing the production version..."
-          echo "Version Tag: $(cat artifacts/version.txt)"
+          # echo "Releasing the production version..."
+          # echo "Version Tag: $(cat artifacts/version.txt)"
+          ls artifacts
