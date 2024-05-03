@@ -93,26 +93,35 @@ jobs:
       - name: Apply version change
         run: |
           echo "Version change from: ${{ env.LATEST_TAG }}"
+          
+          # Extract MAJOR, MINOR, and PATCH parts
+          MAJOR=$(echo "${{ env.LATEST_TAG }}" | cut -d '.' -f1)
+          MINOR=$(echo "${{ env.LATEST_TAG }}" | cut -d '.' -f2)
+          PATCH=$(echo "${{ env.LATEST_TAG }}" | cut -d '.' -f3)
+          
           if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
             if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
               NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
-              SEMANTIC_VERSION=$(echo "${{ env.LATEST_TAG }}" | awk -F'.' '{print $1"."$2+1".0"}')
+              NEW_MAJOR=$((MAJOR + 1))
+              SEMANTIC_VERSION="${NEW_MAJOR}.${MINOR}.${PATCH}"
             fi
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             echo "Minor version bump required."
             if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
               NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
-              SEMANTIC_VERSION=$(echo "${{ env.LATEST_TAG }}" | awk -F'.' '{print $1"."$2"."$3+1}')
+              NEW_MINOR=$((MINOR + 1))
+              SEMANTIC_VERSION="${MAJOR}.${NEW_MINOR}.${PATCH}"
             fi
           elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             echo "Patch version bump required."
             if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
               NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
-              SEMANTIC_VERSION=$(echo "${{ env.LATEST_TAG }}" | awk -F'.' '{print $1"."$2"."$3+1}')
+              NEW_PATCH=$((PATCH + 1))
+              SEMANTIC_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
             fi
           else
             echo "No version change required."
@@ -125,9 +134,10 @@ jobs:
         run: mkdir -p artifacts
 
       - name: Save version to version.txt
-        run: |
-          echo "${{ env.NEXT_VERSION }}" > artifacts/version.txt
-          echo "${{ env.SEMANTIC_VERSION }}" > artifacts/semantic.txt
+        run: echo "${{ env.NEXT_VERSION }}" > artifacts/version.txt
+
+      - name: Save version to semantic.txt
+        run: echo "${{ env.SEMANTIC_VERSION }}" > artifacts/semantic.txt
 
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
