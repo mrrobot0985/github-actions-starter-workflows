@@ -96,41 +96,38 @@ jobs:
           if [ "${{ env.breaking_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.major }}" == "true" ]; then
             echo "Major version bump required."
             if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
-              NEW_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
-            elif [ "${{ github.ref }}" == 'refs/heads/release' ]; then
-              NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+              NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
-              NEW_VERSION="v$(date +'%Y.%m.%d')-beta-${{ github.run_number }}-${{ github.run_attempt }}"
+              SEMANTIC_VERSION=$(echo "${{ env.LATEST_TAG }}" | awk -F'.' '{print $1"."$2+1".0"}')
             fi
           elif [ "${{ env.minor_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.minor }}" == "true" ]; then
             echo "Minor version bump required."
             if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
-              NEW_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
-            elif [ "${{ github.ref }}" == 'refs/heads/release' ]; then
-              NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+              NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
-              NEW_VERSION="v$(date +'%Y.%m.%d')-beta-${{ github.run_number }}-${{ github.run_attempt }}"
+              SEMANTIC_VERSION=$(echo "${{ env.LATEST_TAG }}" | awk -F'.' '{print $1"."$2"."$3+1}')
             fi
           elif [ "${{ env.patch_count }}" -gt 0 ] || [ "${{ steps.pull_request_labels.outputs.patch }}" == "true" ]; then
             echo "Patch version bump required."
             if [ "${{ github.ref }}" == 'refs/heads/develop' ]; then
-              NEW_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
-            elif [ "${{ github.ref }}" == 'refs/heads/release' ]; then
-              NEW_VERSION="v$(date +'%Y.%m.%d')-rc-${{ github.run_number }}-${{ github.run_attempt }}"
+              NEXT_VERSION="v$(date +'%Y.%m.%d')-dev-${{ github.run_number }}-${{ github.run_attempt }}"
             else
-              NEW_VERSION="v$(date +'%Y.%m.%d')-beta-${{ github.run_number }}-${{ github.run_attempt }}"
+              SEMANTIC_VERSION=$(echo "${{ env.LATEST_TAG }}" | awk -F'.' '{print $1"."$2"."$3+1}')
             fi
           else
             echo "No version change required."
-            NEW_VERSION=${{ env.LATEST_TAG }}
+            NEXT_VERSION=${{ env.LATEST_TAG }}
           fi
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+          echo "SEMANTIC_VERSION=$SEMANTIC_VERSION" >> $GITHUB_ENV
 
       - name: Create artifacts directory
         run: mkdir -p artifacts
 
       - name: Save version to version.txt
-        run: echo "${{ env.NEW_VERSION }}" > artifacts/version.txt
+        run: |
+          echo "${{ env.NEXT_VERSION }}" > artifacts/version.txt
+          echo "${{ env.SEMANTIC_VERSION }}" > artifacts/semantic.txt
 
       - name: Store version in artifact
         uses: actions/upload-artifact@v4
@@ -142,7 +139,8 @@ jobs:
 
       - name: Print new version
         run: |
-          echo "New Version: $(cat artifacts/version.txt)"
+          echo "Next Version: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
   build_dev:
     name: Build Development
@@ -171,6 +169,7 @@ jobs:
         run: |
           echo "Building the development version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment and installing pip..."
@@ -217,6 +216,7 @@ jobs:
         run: |
           echo "Building the release candidate / beta version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment and updating pip to the latest version..."
@@ -264,6 +264,7 @@ jobs:
         run: |
           echo "Building the production version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment and ensuring all tools are ready for a production build..."
@@ -314,6 +315,7 @@ jobs:
         run: |
           echo "Running checks on pull requests..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Setup Python Environment
         run: echo "Setting up Python environment appropriate for PR tests..."
@@ -358,6 +360,7 @@ jobs:
         run: |
           echo "Releasing the development version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Finalize Development Release
         run: echo "Finalizing the development release of the Python package..."
@@ -393,6 +396,7 @@ jobs:
         run: |
           echo "Releasing the release candidate / beta version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Finalize RC/Beta Release
         run: echo "Finalizing the release candidate or beta version of the Python package..."
@@ -430,6 +434,7 @@ jobs:
         run: |
           echo "Releasing the production version..."
           echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Symantic Version: $(cat artifacts/semantic.txt)"
 
       - name: Echo Finalize Production Release
         run: echo "Finalizing the production version of the Python package..."
