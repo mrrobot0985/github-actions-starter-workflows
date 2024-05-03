@@ -125,7 +125,7 @@ jobs:
       - name: Print new version
         run: |
           echo "New Version: $(cat artifacts/${{ github.ref }}/version.txt)"
-          
+
   build_dev:
     name: Build Development
     runs-on: ubuntu-latest
@@ -138,6 +138,13 @@ jobs:
         with:
           fetch-depth: 0 
           token: ${{ secrets.PAT_TOKEN }}
+
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
 
       # Placeholder steps for building the development version...
       - name: Placeholder for building the development version
@@ -156,6 +163,13 @@ jobs:
           fetch-depth: 0 
           token: ${{ secrets.PAT_TOKEN }}
 
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
+
       # Placeholder steps for building the release candidate / beta version...
       - name: Placeholder for building the release candidate / beta version
         run: echo "Building the release candidate / beta version..."
@@ -172,6 +186,13 @@ jobs:
         with:
           fetch-depth: 0 
           token: ${{ secrets.PAT_TOKEN }}
+
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
 
       # Placeholder steps for building the production version...
       - name: Placeholder for building the production version
@@ -190,6 +211,13 @@ jobs:
           fetch-depth: 0 
           token: ${{ secrets.PAT_TOKEN }}
 
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
+
       # Placeholder steps for running checks on pull requests...
       - name: Placeholder for running checks on pull requests
         run: echo "Running checks on pull requests..."
@@ -201,6 +229,14 @@ jobs:
     if: github.ref == 'refs/heads/develop'
 
     steps:
+
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
+
       - name: Placeholder for releasing the development version
         run: echo "Releasing the development version..."
 
@@ -211,6 +247,14 @@ jobs:
     if: github.ref == 'refs/heads/release'
 
     steps:
+
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
+
       - name: Placeholder for releasing the release candidate / beta version
         run: echo "Releasing the release candidate / beta version..."
 
@@ -221,5 +265,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+
+      # Retrieve versioning artifacts
+      - name: Download versioning artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: versioning-artifacts
+          path: artifacts/${{ github.ref }}/version.txt
+
       - name: Placeholder for releasing the production version
         run: echo "Releasing the production version..."
