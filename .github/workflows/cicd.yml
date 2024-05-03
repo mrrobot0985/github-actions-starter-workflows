@@ -144,7 +144,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'
 
@@ -152,10 +152,9 @@ jobs:
       # Placeholder steps for building the development version...
       - name: Placeholder for building the development version
         run: |
-          # echo "Building the development version..."
-          # echo "Version Tag: $(cat artifacts/version.txt)"
+          echo "Building the development version..."
           echo "VERSION=$(cat ./artifacts/version.txt)" >> $GITHUB_ENV
-          echo ${{ env.VERSION }}
+          echo "Version Tag: ${{ env.VERSION }}"
 
 
 ################################################################################
@@ -177,7 +176,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'
 
@@ -206,7 +205,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'
 
@@ -235,7 +234,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'
 
@@ -259,7 +258,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'
 
@@ -282,7 +281,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'
 
@@ -304,7 +303,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
-          path: artifacts/version.txt
+          path: artifacts
         env:
           cache: 'none'        
 
