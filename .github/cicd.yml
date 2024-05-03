@@ -141,7 +141,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
@@ -165,7 +165,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
@@ -189,7 +189,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
@@ -213,7 +213,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
@@ -232,7 +232,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
@@ -250,7 +250,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
@@ -268,7 +268,7 @@ jobs:
 
       # Retrieve versioning artifacts
       - name: Download versioning artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: versioning-artifacts
           path: artifacts/${{ github.ref }}/version.txt
