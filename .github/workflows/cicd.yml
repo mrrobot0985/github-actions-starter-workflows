@@ -119,7 +119,7 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/
-          retention-days: 5
+          retention-days: 1
           overwrite: true
 
       - name: Print new version
@@ -145,6 +145,8 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'
 
       # Placeholder steps for building the development version...
       - name: Placeholder for building the development version
@@ -171,6 +173,9 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'
+
 
       # Placeholder steps for building the release candidate / beta version...
       - name: Placeholder for building the release candidate / beta version
@@ -197,6 +202,9 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'
+
 
       # Placeholder steps for building the production version...
       - name: Placeholder for building the production version
@@ -223,6 +231,9 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'
+
 
       # Placeholder steps for running checks on pull requests...
       - name: Placeholder for running checks on pull requests
@@ -244,6 +255,9 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'
+
 
       - name: Placeholder for releasing the development version
         run: |
@@ -264,6 +278,8 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'
 
       - name: Placeholder for releasing the release candidate / beta version
         run: |
@@ -284,6 +300,8 @@ jobs:
         with:
           name: versioning-artifacts
           path: artifacts/version.txt
+        env:
+          cache: 'none'        
 
       - name: Placeholder for releasing the production version
         run: |
